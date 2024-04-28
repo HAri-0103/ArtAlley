@@ -1,0 +1,80 @@
+const cookie = cookies().get("token");
+
+const verifyToken : JwtPayload | any = jwt.verify(cookie?.value || "", "secret");
+console.log(verifyToken);
+console.log(verifyToken.name);
+console.log(verifyToken.username);
+
+
+//
+<input type="file" name="avatar" id="avatar" className=" hidden" onChange={({target})=>{
+                                if(!target.files) return;
+                                const file = target.files[0];
+                                setAvt(file);
+                                setPreview(URL.createObjectURL(file));
+                            }} /
+
+//////////////////////////////////////////////////////////////
+ const existingUser = await User.findOne({username:username,email:email});
+        if(!existingUser){
+            return Response.json({status:400});
+        };
+        const byte = await avatar?.arrayBuffer();
+        const buffer = Buffer.from(byte);
+
+        const path =join("public","profile",`${username}.jpg`);
+        await writeFile(path,buffer);
+
+        const salt = await bcryptjs.genSalt(10);
+        const hash = await bcryptjs.hash(password || "",salt);
+
+        const user = new User({
+            name:name,
+            username:username,
+            email:email,
+            password:hash,
+            avatar:path
+        });
+        const data = {id:user._id,username:user.username,email:user.email};
+
+        const token = await jwt.sign(data, "secret", {expiresIn:"1h"});
+        user.save();
+        const response = NextResponse.json({success:true});
+        response.cookies.set("token", token, {httpOnly:true});
+        return response;
+import { dbConnect } from "@/dbConfig/db";
+import jwt,{Jwt, JwtPayload} from "jsonwebtoken";
+import { cookies } from "next/headers";
+import { NextResponse } from "next/server";
+import bcryptjs from "bcryptjs";
+import User from "@/models/User";
+import { join } from "path";
+import { writeFile } from "node:fs/promises";
+
+
+dbConnect();
+export async function POST(req:Request, res:Response) {
+    try {
+        const form = await req.formData();
+        const avatar = form.get("avatar") as File;
+        const name = form.get("name") as string;
+        const username = form.get("username") as string;
+        const email = form.get("emailid") as string;
+        const password = form.get("password") as string;
+
+        console.log(avatar,name,username,email,password);
+
+        const bytes = await avatar.arrayBuffer();
+        const buffer = Buffer.from(bytes);
+        const path = join(process.cwd(),"public","uploads",avatar.name);
+        console.log(path);
+        await writeFile(path,buffer);
+
+        console.log("File Uploaded");
+
+        return NextResponse.json({message:"Signup Successfull"},{status:200});
+        
+    } catch (error:any) {
+        return NextResponse.json({error:error},{status:500});
+    }
+};
