@@ -5,6 +5,7 @@ import PostForm from "@/components/forms/PostForm";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { useSearchParams } from "next/navigation";
+import { Suspense } from "react";
 
 export default function CreatePost() {
     const [post,setPost] = useState({
@@ -25,6 +26,9 @@ export default function CreatePost() {
 
     return (
         <div className="md:absolute md:left-0 flex flex-1">
+            <Suspense>
+                <search />
+            </Suspense>
             <div className="common-container">
                 <div className="max-w-5xl flex-start gap-3 justify-start">
                     <MdOutlineAddPhotoAlternate
