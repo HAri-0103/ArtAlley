@@ -6,6 +6,10 @@ import { EdgeStoreProvider } from "@/lib/edgestore";
 
 const inter = Inter({ subsets: ["latin"] });
 
+export const meta: Metadata = {
+  title: "ArtAlley",
+};
+
 export default function RootLayout({
   children,
 }: Readonly<{
